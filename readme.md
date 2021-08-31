@@ -4,6 +4,9 @@ A simple command line utitly to patch existing x64 executables to include the
 export symbols `NvOptimusEnablement` and `AmdPowerXpressRequestHighPerformance` 
 as required to enable the discreet GPU on some machines (mainly laptops)
 
+Originally written to be used with the game [Sector's Edge](https://sectorsedge.com) 
+it should work with any x64 Windows application.
+
 ## Installation and Usage
 
 To install:
@@ -19,10 +22,15 @@ One installed you can patch an existing executable with the following command:
 Currently on x64 executables are supported.
 
 
+## How it Works
+
+See [this blog post](https://www.toptensoftware.com/blog/nvpatch-how-it-works/).
+
+
 ## More Options
 
 ```
-nvpatch v0.1.102.0
+nvpatch v0.1.103.0
 Copyright c 2021 Topten Software. All Rights Reserved
 
 Usage: nvpatch [options] <inputfile.exe> [<outputfile.exe]
