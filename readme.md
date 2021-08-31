@@ -30,11 +30,10 @@ Usage: nvpatch [options] <inputfile.exe> [<outputfile.exe]
 Adds, updates or queries the export symbols 'NvOptimusEnablement'
 and 'AmdPowerXpressRequestHighPerformance' in an existing .exe
 
+Options:
   --enable       sets GPU export symbols to 1 (adding if missing
   --disable      sets GPU export symbols to 0 (if it exists)
   --status       shows the current NvOptimusEnablement status
-
-Options:
   --help         show this help, or help for a command
   --version      show version information
 ```

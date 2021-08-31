@@ -179,11 +179,10 @@ namespace nvpatch
             Console.WriteLine("Adds, updates or queries the export symbols 'NvOptimusEnablement'");
             Console.WriteLine("and 'AmdPowerXpressRequestHighPerformance' in an existing .exe");
             Console.WriteLine();
+            Console.WriteLine("Options:");
             Console.WriteLine("  --enable       sets GPU export symbols to 1 (adding if missing");
             Console.WriteLine("  --disable      sets GPU export symbols to 0 (if it exists)");
             Console.WriteLine("  --status       shows the current NvOptimusEnablement status");
-            Console.WriteLine();
-            Console.WriteLine("Options:");
             Console.WriteLine("  --help         show this help, or help for a command");
             Console.WriteLine("  --version      show version information");
         }
