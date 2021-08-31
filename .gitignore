@@ -1,0 +1,15 @@
+bin
+obj
+Debug
+Release
+*.user
+*.suo
+*.userprefs
+.DS_Store
+build
+.vs
+*.opendb
+*.db
+packages
+il.*.txt
+md.*.txt

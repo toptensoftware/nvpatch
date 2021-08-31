@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "nvpatch": {
+      "commandName": "Project",
+      "commandLineArgs": "SectorsEdge.exe SectorsEdge_patched.exe"
+    }
+  }
+}
