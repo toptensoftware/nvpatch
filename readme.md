@@ -7,6 +7,18 @@ as required to enable the discreet GPU on some machines (mainly laptops)
 Originally written to be used with the game [Sector's Edge](https://sectorsedge.com) 
 it should work with any x64 Windows application.
 
+## Experimental Status
+
+At this stage, this project should be considered experimental - I've only just 
+got it working and have only done some very basic testing done. I'm keen 
+to hear how it works for others.
+
+If you find problems or have suggestions, please [log an issue](https://github.com/toptensoftware/nvpatch/issues)
+
+Or, if it works for you, please drop me an [email](https://www.toptensoftware.com/contact)
+and let me know.
+
+
 ## Installation and Usage
 
 To install:
