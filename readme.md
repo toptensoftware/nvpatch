@@ -10,7 +10,7 @@ it should work with any x64 Windows application.
 ## Experimental Status
 
 At this stage, this project should be considered experimental - I've only just 
-got it working and have only done some very basic testing done. I'm keen 
+got it working and have only done some very basic testing. I'm keen 
 to hear how it works for others.
 
 If you find problems or have suggestions, please [log an issue](https://github.com/toptensoftware/nvpatch/issues)
