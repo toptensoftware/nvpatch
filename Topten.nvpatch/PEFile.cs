@@ -230,6 +230,11 @@ namespace nvpatch
                 last.Close();
             }
 
+            // Get the end of the last original section, IE: end of the unmodified PE file
+            var lastOriginalSection = SectionHeaders + (CoffHeader->NumberOfSection - 1);
+            var lastOriginalSectionEnd = lastOriginalSection->PointerToRawData + lastOriginalSection->SizeOfRawData;
+            var peFileHasExtraBytes = lastOriginalSectionEnd != _bytes.Length;
+
             // Update the sizes
             foreach (var s in _newSections)
             {
@@ -272,6 +277,13 @@ namespace nvpatch
                 // Write loaded bytes
                 file.Write(_bytes);
 
+                // If the original PE file had extra bytes, seek to the end of
+                // the PE file's content.
+                if (peFileHasExtraBytes)
+                    file.Position = lastOriginalSectionEnd;
+
+                long addedBytes = default;
+
                 // Write new sections
                 foreach (var s in _newSections)
                 {
@@ -285,6 +297,26 @@ namespace nvpatch
                     // Write padding
                     var padding = new byte[s.SizeOnDisk - s.Bytes.Length];
                     file.Write(padding);
+
+                    addedBytes += s.Bytes.Length;
+                    addedBytes += padding.Length;
+                }
+
+                if (peFileHasExtraBytes)
+                {
+                    /* Re-insert any bytes that were after the end of the original
+                     * PE file, after the new end. There's a decent chance this will
+                     * break the executable, but it would have anyway if we did nothing.
+                     */
+
+                    file.Write(_bytes[(int)lastOriginalSectionEnd..]);
+
+                    /* .NET's "PublishSingleFile" setting will turn the executable into a
+                     * "bundle", which involves appending all of the application's dependencies,
+                     * content, and configuration to the end of the "AppHost". This manifest
+                     * stores offsets to those files, and needs to be updated.
+                     */
+                    BundleHelper.CheckForAndUpdateManifest(_bytes, file, addedBytes);
                 }
             }
         }
