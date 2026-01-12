@@ -8,7 +8,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>nvpatch</ToolCommandName>
-    <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
@@ -20,10 +19,10 @@
     <PackageTags>NvOptimusEnablement, AmdPowerXpressRequestHighPerformance, exe, patch</PackageTags>
     <Description>A simple utility to add the NvOptimusEnablement and AmdPowerXpressRequestHighPerformance export symbols to an existing executable</Description>
     <RepositoryUrl>https://github.com/toptensoftware/nvpatch</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
-
-    <ItemGroup>
-        <None Include="..\README.md" Pack="true" PackagePath="\"/>
-    </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
 </Project>
