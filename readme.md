@@ -1,11 +1,11 @@
 # nvpatch
 
-A simple command line utitly to patch existing x64 executables to include the 
+A simple command line utitly to patch existing x86 and x64 executables to include the 
 export symbols `NvOptimusEnablement` and `AmdPowerXpressRequestHighPerformance` 
 as required to enable the discreet GPU on some machines (mainly laptops)
 
 Originally written to be used with the game [Sector's Edge](https://sectorsedge.com) 
-it should work with any x64 Windows application.
+it should work with any x86 or x64 Windows application.
 
 ## Experimental Status
 
@@ -25,13 +25,14 @@ To install:
 
 > dotnet tool install -g Topten.nvpatch
 
-(requires .NET 5 installed)
+(requires .NET 8 installed)
 
 One installed you can patch an existing executable with the following command:
 
 > nvpatch --enable MyProgram.exe
 
-Currently on x64 executables are supported.
+x64 support seems stable.  x86 support has just been added and seems to basically work, but hasn't 
+been fully tested.
 
 
 ## How it Works
@@ -42,7 +43,7 @@ See [this blog post](https://www.toptensoftware.com/blog/nvpatch-how-it-works/).
 ## More Options
 
 ```
-nvpatch v0.1.103.0
+nvpatch v0.1.106.0
 Copyright c 2021 Topten Software. All Rights Reserved
 
 Usage: nvpatch [options] <inputfile.exe> [<outputfile.exe]
@@ -61,7 +62,7 @@ Options:
 
 ## License
 
-Copyright © 2014-2021 Topten Software.  
+Copyright © 2014-2025 Topten Software.  
 All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License") you may not use this
