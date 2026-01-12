@@ -4,7 +4,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>nvpatch</ToolCommandName>
@@ -15,7 +15,6 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Copyright>Copyright © 2021 Topten Software.  All Rights Reserved</Copyright>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageIcon>nuget-icon.png</PackageIcon>
     <PackageProjectUrl>https://github.com/toptensoftware/nvpatch</PackageProjectUrl>
     <PackageTags>NvOptimusEnablement, AmdPowerXpressRequestHighPerformance, exe, patch</PackageTags>
     <Description>A simple utility to add the NvOptimusEnablement and AmdPowerXpressRequestHighPerformance export symbols to an existing executable</Description>

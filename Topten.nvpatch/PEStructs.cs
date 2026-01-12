@@ -125,6 +125,18 @@ namespace nvpatch
         Reserved,
     }
 
+    public enum PEArchitecture
+    {
+        PE32,      // x86, Magic 0x10b
+        PE32Plus   // x64, Magic 0x20b
+    }
+
+    public static class MachineType
+    {
+        public const ushort I386 = 0x014c;   // x86
+        public const ushort AMD64 = 0x8664;  // x64
+    }
+
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     struct SectionHeader
     {

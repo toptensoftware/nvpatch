@@ -151,7 +151,10 @@ namespace nvpatch
             }
 
             // Clear the checksum (just in case)
-            pe.WindowsHeader->CheckSum = 0;
+            if (pe.Architecture == PEArchitecture.PE32)
+                pe.WindowsHeader32->CheckSum = 0;
+            else
+                pe.WindowsHeaderPlus->CheckSum = 0;
 
             // Rewrite the file
             pe.Write(outFile);

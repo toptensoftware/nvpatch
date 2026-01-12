@@ -37,16 +37,45 @@ namespace nvpatch
             if (CoffHeader->SizeOfOptionalHeader == 0)
                 throw new InvalidDataException("Optional header missing");
 
-            // Get the standard header
-            StandardHeader = (OptionalHeaderStandardPlus*)(CoffHeader + 1);
-            if (StandardHeader->Magic != 0x20b)
-                throw new InvalidDataException("Not a PE32+ format header");
+            // Get the standard header and determine architecture
+            var standardHeaderBase = (OptionalHeaderStandard*)(CoffHeader + 1);
+            ushort magic = standardHeaderBase->Magic;
 
-            // Get the windows header
-            WindowsHeader = (OptionalHeaderWindowsPlus*)(StandardHeader + 1);
+            if (magic == 0x10b)
+            {
+                // PE32 (x86)
+                Architecture = PEArchitecture.PE32;
+                StandardHeader32 = standardHeaderBase;
+                WindowsHeader32 = (OptionalHeaderWindows*)(StandardHeader32 + 1);
+
+                // Validate machine type
+                if (CoffHeader->Machine != MachineType.I386)
+                    throw new InvalidDataException($"PE32 format but machine type is 0x{CoffHeader->Machine:X4}, expected 0x{MachineType.I386:X4}");
+
+                // Get the data directories
+                DataDirectories = (DataDirectory*)(WindowsHeader32 + 1);
+            }
+            else if (magic == 0x20b)
+            {
+                // PE32+ (x64)
+                Architecture = PEArchitecture.PE32Plus;
+                StandardHeaderPlus = (OptionalHeaderStandardPlus*)standardHeaderBase;
+                WindowsHeaderPlus = (OptionalHeaderWindowsPlus*)(StandardHeaderPlus + 1);
+
+                // Validate machine type
+                if (CoffHeader->Machine != MachineType.AMD64)
+                    throw new InvalidDataException($"PE32+ format but machine type is 0x{CoffHeader->Machine:X4}, expected 0x{MachineType.AMD64:X4}");
+
+                // Get the data directories
+                DataDirectories = (DataDirectory*)(WindowsHeaderPlus + 1);
+            }
+            else
+            {
+                throw new InvalidDataException($"Unsupported PE format, magic number: 0x{magic:X4}");
+            }
 
             // Get the section headers
-            SectionHeaders = (SectionHeader*)(((byte*)StandardHeader) + CoffHeader->SizeOfOptionalHeader);
+            SectionHeaders = (SectionHeader*)(((byte*)standardHeaderBase) + CoffHeader->SizeOfOptionalHeader);
 
             // Find the first used section header
             for (int i = 0; i < CoffHeader->NumberOfSection; i++)
@@ -58,8 +87,7 @@ namespace nvpatch
                 }
             }
 
-            // Get the data directories
-            DataDirectories = (DataDirectory*)(WindowsHeader + 1);
+            // Calculate data directory count
             DataDirectoryCount = (int)(((byte*)SectionHeaders - (byte*)DataDirectories) / Marshal.SizeOf<DataDirectory>());
         }
 
@@ -86,14 +114,43 @@ namespace nvpatch
         public CoffHeader* CoffHeader { get; }
 
         /// <summary>
-        /// Gets the optional standard header
+        /// Gets the PE architecture (PE32 or PE32+)
         /// </summary>
-        public OptionalHeaderStandardPlus* StandardHeader { get; }
+        public PEArchitecture Architecture { get; private set; }
 
         /// <summary>
-        /// Gets the optional windows header
+        /// Gets the optional standard header for PE32+ (x64)
         /// </summary>
-        public OptionalHeaderWindowsPlus* WindowsHeader { get; }
+        public OptionalHeaderStandardPlus* StandardHeaderPlus { get; private set; }
+
+        /// <summary>
+        /// Gets the optional windows header for PE32+ (x64)
+        /// </summary>
+        public OptionalHeaderWindowsPlus* WindowsHeaderPlus { get; private set; }
+
+        /// <summary>
+        /// Gets the optional standard header for PE32 (x86)
+        /// </summary>
+        public OptionalHeaderStandard* StandardHeader32 { get; private set; }
+
+        /// <summary>
+        /// Gets the optional windows header for PE32 (x86)
+        /// </summary>
+        public OptionalHeaderWindows* WindowsHeader32 { get; private set; }
+
+        /// <summary>
+        /// Gets the file alignment for the current architecture
+        /// </summary>
+        public uint FileAlignment => Architecture == PEArchitecture.PE32
+            ? WindowsHeader32->FileAlignment
+            : WindowsHeaderPlus->FileAlignment;
+
+        /// <summary>
+        /// Gets the section alignment for the current architecture
+        /// </summary>
+        public uint SectionAlignment => Architecture == PEArchitecture.PE32
+            ? WindowsHeader32->SectionAlignment
+            : WindowsHeaderPlus->SectionAlignment;
 
         /// <summary>
         /// Gets the section headers
@@ -208,8 +265,8 @@ namespace nvpatch
             }
 
             // Round to alignments
-            rva = Utils.RoundToAlignment(rva, WindowsHeader->SectionAlignment);
-            filePosition = Utils.RoundToAlignment(filePosition, WindowsHeader->FileAlignment);
+            rva = Utils.RoundToAlignment(rva, SectionAlignment);
+            filePosition = Utils.RoundToAlignment(filePosition, FileAlignment);
 
             // Create section builder
             var b = new PESectionBuilder(this, rva, filePosition);
@@ -238,14 +295,28 @@ namespace nvpatch
             // Update the sizes
             foreach (var s in _newSections)
             {
-                if ((s.Characteristics & SectionFlags.InitializedData) != 0)
-                    StandardHeader->SizeOfInitializedData += s.SizeOnDisk;
-                if ((s.Characteristics & SectionFlags.UninitializedData) != 0)
-                    StandardHeader->SizeOfUninitializedData += s.SizeOnDisk;
-                if ((s.Characteristics & SectionFlags.Code) != 0)
-                    StandardHeader->SizeOfCode += s.SizeOnDisk;
+                if (Architecture == PEArchitecture.PE32)
+                {
+                    if ((s.Characteristics & SectionFlags.InitializedData) != 0)
+                        StandardHeader32->SizeOfInitializedData += s.SizeOnDisk;
+                    if ((s.Characteristics & SectionFlags.UninitializedData) != 0)
+                        StandardHeader32->SizeOfUninitializedData += s.SizeOnDisk;
+                    if ((s.Characteristics & SectionFlags.Code) != 0)
+                        StandardHeader32->SizeOfCode += s.SizeOnDisk;
 
-                WindowsHeader->SizeOfImage += s.SizeOnDisk;
+                    WindowsHeader32->SizeOfImage += s.SizeOnDisk;
+                }
+                else
+                {
+                    if ((s.Characteristics & SectionFlags.InitializedData) != 0)
+                        StandardHeaderPlus->SizeOfInitializedData += s.SizeOnDisk;
+                    if ((s.Characteristics & SectionFlags.UninitializedData) != 0)
+                        StandardHeaderPlus->SizeOfUninitializedData += s.SizeOnDisk;
+                    if ((s.Characteristics & SectionFlags.Code) != 0)
+                        StandardHeaderPlus->SizeOfCode += s.SizeOnDisk;
+
+                    WindowsHeaderPlus->SizeOfImage += s.SizeOnDisk;
+                }
             }
 
             // Write new section headers into the image header

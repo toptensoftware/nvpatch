@@ -100,9 +100,9 @@ namespace nvpatch
         public uint Size => (uint)(_stream?.Length ?? _bytes.Length);
 
         /// <summary>
-        /// The calculated disk size 
+        /// The calculated disk size
         /// </summary>
-        public uint SizeOnDisk => Utils.RoundToAlignment(Size, Owner.WindowsHeader->FileAlignment);
+        public uint SizeOnDisk => Utils.RoundToAlignment(Size, Owner.FileAlignment);
 
         /// <summary>
         /// The calculates virtual size
